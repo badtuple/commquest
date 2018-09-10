@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
+
+	"./frontends"
 )
 
 func init() {
@@ -42,7 +44,14 @@ func loadConfig() error {
 }
 
 func startServer() error {
-	log.Println("starting server (TODO)")
+	log.Println("starting frontend server")
+
+	fe := frontends.New(config.Frontend)
+	err := fe.Serve()
+	if err != nil {
+		return err
+	}
+
 	log.Println("server started (TODO)")
 	return nil
 }
