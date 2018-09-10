@@ -1,0 +1,16 @@
+development:
+  adapter: postgresql
+  encoding: unicode
+  database: "commquest_development"
+  user: postgres
+  pool: 5
+  timeout: 5000
+
+test: &test
+  adapter: postgresql
+  encoding: unicode
+  database: "commquest_test"
+  user: postgres
+  pool: 5
+  timeout: 5000
+
