@@ -1,7 +1,10 @@
 package api
 
 import (
+	"database/sql"
 	"net/http"
+
+	"../../models"
 
 	"github.com/julienschmidt/httprouter"
 )
@@ -16,19 +19,12 @@ func (_ APIFrontend) Serve() error {
 	router := httprouter.New()
 
 	router.POST("/register", wrap(registerPlayerHandler))
-	router.GET("/account/:id", wrap(getPlayerHandler))
+	router.GET("/account/:handle", wrap(getPlayerHandler))
 
 	// For preflight options calls
 	router.HandleMethodNotAllowed = false
 
 	return http.ListenAndServe(":8080", server{router})
-}
-
-type context struct {
-	Response http.ResponseWriter
-	Request  *http.Request
-	Params   *httprouter.Params
-	//Player *models.Player
 }
 
 type server struct {
@@ -53,5 +49,51 @@ func wrap(h func(context)) httprouter.Handle {
 	}
 }
 
-func registerPlayerHandler(ctx context) {}
-func getPlayerHandler(ctx context)      {}
+func registerPlayerHandler(ctx context) {
+	var resp struct {
+		Handle string `json:"handle"`
+		Name   string `json:"name"`
+		Class  string `json:"class"`
+	}
+
+	err := ctx.BodyStruct(&resp)
+	if err != nil {
+		ctx.ServerError(err.Error())
+		return
+	}
+
+	p, err := models.FindPlayerByHandle(resp.Handle)
+	if err == nil {
+		ctx.BadRequest("player alreadye exists by that handle")
+		return
+	}
+
+	if err != sql.ErrNoRows {
+		ctx.ServerError(err.Error())
+		return
+	}
+
+	p, err = models.CreatePlayer(resp.Handle, resp.Name, resp.Class)
+	if err != nil {
+		ctx.ServerError(err.Error())
+		return
+	}
+
+	ctx.Ok(p)
+}
+
+func getPlayerHandler(ctx context) {
+	handle := ctx.Params.ByName("handle")
+	p, err := models.FindPlayerByHandle(handle)
+	if err != nil {
+		if err != sql.ErrNoRows {
+			ctx.ServerError(err.Error())
+			return
+		}
+
+		ctx.BadRequest("player already exists by that handle")
+		return
+	}
+
+	ctx.Ok(p)
+}
