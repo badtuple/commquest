@@ -52,3 +52,13 @@ func FindPlayerByHandle(handle string) (Player, error) {
 
 	return p, err
 }
+
+func AllPlayers() ([]Player, error) {
+	var ps []Player
+	err := db.PSQL().Select(&ps, `
+		SELECT id, handle, name, class, xp, created_at, updated_at
+		FROM players
+	`)
+
+	return ps, err
+}

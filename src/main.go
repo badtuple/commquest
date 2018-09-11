@@ -63,7 +63,7 @@ func startFrontendAPI() error {
 }
 
 func startGameLoop() {
-	for range time.Tick(1 * time.Minute) {
+	for range time.Tick(60 * time.Second) {
 		game.PlayTurn()
 	}
 }
