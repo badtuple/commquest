@@ -3,12 +3,17 @@ package main
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
+
+	"github.com/sirupsen/logrus"
 
 	"./frontends"
 )
 
+var log *logrus.Entry
+
 func init() {
+	log = logrus.WithField("component", "main")
+
 	log.Println("initializing Commquest")
 	err := loadConfig()
 	if err != nil {
@@ -43,7 +48,7 @@ func loadConfig() error {
 	return nil
 }
 
-func startServer() error {
+func startFrontendAPI() error {
 	log.Println("starting frontend server")
 
 	fe := frontends.New(config.Frontend)
@@ -52,12 +57,22 @@ func startServer() error {
 		return err
 	}
 
-	log.Println("server started (TODO)")
+	log.Println("server started")
 	return nil
 }
 
+func startGameLoop() {
+	//for time.Tick(1 * time.Minute) {
+	//game.PlayTurn()
+	//}
+}
+
 func main() {
-	err := startServer()
+	// TODO: Graceful shutdown
+
+	go startGameLoop()
+
+	err := startFrontendAPI()
 	if err != nil {
 		panic(err)
 	}

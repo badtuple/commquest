@@ -7,7 +7,14 @@ import (
 	"../../models"
 
 	"github.com/julienschmidt/httprouter"
+	"github.com/sirupsen/logrus"
 )
+
+var log *logrus.Entry
+
+func init() {
+	log = logrus.WithField("component", "frontend")
+}
 
 type APIFrontend struct{}
 
