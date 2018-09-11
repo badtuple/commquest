@@ -1,15 +1,12 @@
 package frontends
 
 import (
+	"../util"
 	"./api"
 	"github.com/sirupsen/logrus"
 )
 
-var log *logrus.Entry
-
-func init() {
-	log = logrus.WithField("component", "frontend")
-}
+var log *logrus.Entry = util.LoggerFor("frontend")
 
 // All frontends must implement this interface.
 type Frontend interface {

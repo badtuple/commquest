@@ -5,16 +5,13 @@ import (
 	"net/http"
 
 	"../../models"
+	"../../util"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
 )
 
-var log *logrus.Entry
-
-func init() {
-	log = logrus.WithField("component", "frontend")
-}
+var log *logrus.Entry = util.LoggerFor("frontend")
 
 type APIFrontend struct{}
 

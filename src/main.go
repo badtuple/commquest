@@ -3,17 +3,18 @@ package main
 import (
 	"encoding/json"
 	"io/ioutil"
+	"time"
 
 	"github.com/sirupsen/logrus"
 
 	"./frontends"
+	"./game"
+	"./util"
 )
 
-var log *logrus.Entry
+var log *logrus.Entry = util.LoggerFor("main")
 
 func init() {
-	log = logrus.WithField("component", "main")
-
 	log.Println("initializing Commquest")
 	err := loadConfig()
 	if err != nil {
@@ -62,9 +63,9 @@ func startFrontendAPI() error {
 }
 
 func startGameLoop() {
-	//for time.Tick(1 * time.Minute) {
-	//game.PlayTurn()
-	//}
+	for range time.Tick(1 * time.Minute) {
+		game.PlayTurn()
+	}
 }
 
 func main() {
