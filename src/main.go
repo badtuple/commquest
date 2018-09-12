@@ -51,19 +51,18 @@ func loadConfig() error {
 
 func startFrontendAPI() error {
 	log.Println("starting frontend server")
-
 	fe := frontends.New(config.Frontend)
+
 	err := fe.Serve()
 	if err != nil {
 		return err
 	}
 
-	log.Println("server started")
 	return nil
 }
 
 func startGameLoop() {
-	for range time.Tick(60 * time.Second) {
+	for range time.Tick(10 * time.Second) {
 		game.PlayTurn()
 	}
 }
@@ -75,7 +74,7 @@ func main() {
 
 	err := startFrontendAPI()
 	if err != nil {
-		panic(err)
+		log.Fatal("frontend server couldn't be started: %v", err.Error())
 	}
 
 	log.Println("shutting down")

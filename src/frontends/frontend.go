@@ -6,7 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var log *logrus.Entry = util.LoggerFor("frontend")
+var log *logrus.Entry = util.LoggerFor("frnt")
 
 // All frontends must implement this interface.
 type Frontend interface {

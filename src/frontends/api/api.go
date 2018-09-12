@@ -11,7 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var log *logrus.Entry = util.LoggerFor("frontend")
+var log *logrus.Entry = util.LoggerFor("frnt")
 
 type APIFrontend struct{}
 
@@ -28,6 +28,7 @@ func (_ APIFrontend) Serve() error {
 	// For preflight options calls
 	router.HandleMethodNotAllowed = false
 
+	log.Println("started [api] frontend")
 	return http.ListenAndServe(":8080", server{router})
 }
 
