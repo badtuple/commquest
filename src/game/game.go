@@ -1,6 +1,9 @@
 package game
 
 import (
+	"fmt"
+	"math/rand"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 
@@ -23,8 +26,6 @@ func PlayTurn() {
 	if err != nil {
 		log.Error("could not increment level. %v", err.Error())
 	}
-
-	log.Println("ending turn")
 }
 
 // Right now this increments 1 xp for every turn for every player.
@@ -43,7 +44,7 @@ func incrementXpForIdle() error {
 		return err
 	}
 
-	log.Printf("incremnted xp for %v players", affected)
+	log.Printf("%v players had xp incremented", affected)
 	return nil
 }
 
@@ -61,14 +62,18 @@ func incrementLevels() error {
 				continue
 			}
 
+			// random stat to be incremented
+			stat := models.StatList[rand.Intn(len(models.StatList))]
+
+			query := fmt.Sprintf(`
+				UPDATE players
+				SET level = level + 1, %v = %v + 1, updated_at = NOW()
+				WHERE id = $1`, stat, stat,
+			)
+
 			// Level up
 			p.Level = level
-			_, err = tx.Exec(`
-				UPDATE players
-				SET level = level + 1, updated_at = NOW()
-				WHERE id = $1
-			`, p.ID)
-
+			_, err = tx.Exec(query, p.ID)
 			if err != nil {
 				return err
 			}
@@ -81,6 +86,9 @@ func incrementLevels() error {
 	if err != nil {
 		return err
 	}
-	log.Printf("incremented level for %v players", affected)
+
+	if affected > 0 {
+		log.Printf("%v players leveled up", affected)
+	}
 	return nil
 }

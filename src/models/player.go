@@ -40,6 +40,8 @@ type Player struct {
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
 }
 
+var StatList = []string{"strength", "charisma", "intellect", "agility", "luck"}
+
 func (p Player) StatMap() map[string]int {
 	return map[string]int{
 		"strength":  p.Strength,
