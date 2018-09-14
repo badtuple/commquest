@@ -1,19 +1,12 @@
 package slack_frontend
 
 import (
-	"bytes"
 	"encoding/json"
 	"log"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/nlopes/slack"
-	"github.com/nlopes/slack/slackevents"
 )
-
-// TODO: Replace with config option. Don't push to git
-var TOKEN = "TOKEN"
-var api = slack.New(TOKEN)
 
 type SlackFrontend struct{}
 
@@ -42,48 +35,29 @@ func (s server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func eventHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	buf := new(bytes.Buffer)
-	buf.ReadFrom(r.Body)
-	body := buf.String()
-	eventsAPIEvent, e := slackevents.ParseEvent(json.RawMessage(body), slackevents.OptionVerifyToken(&slackevents.TokenComparator{TOKEN}))
-	if e != nil {
+	var resp map[string]interface{}
+	err := json.NewDecoder(r.Body).Decode(&resp)
+	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
-	log.Printf("%+v", body)
-
-	if eventsAPIEvent.Type == slackevents.URLVerification {
-		var r *slackevents.ChallengeResponse
-		err := json.Unmarshal([]byte(body), &r)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-		}
-		w.Header().Set("Content-Type", "text")
-		w.Write([]byte(r.Challenge))
+	raw, ok := resp["type"]
+	if !ok {
+		log.Printf("event has no type: %+v", resp)
+		return
 	}
 
-	//if eventsAPIEvent.Type == slackevents.CallbackEvent {
-	//postParams := slack.PostMessageParameters{}
-	//innerEvent := eventsAPIEvent.InnerEvent
+	typ, ok := raw.(string)
+	if !ok {
+		log.Printf("event type is not a string: %+v", resp)
+		return
+	}
 
-	//switch ev := innerEvent.Data.(type) {
-	//case *slackevents.AppMentionEvent:
-	//api.PostMessage(ev.Channel, "Yes, hello.", postParams)
-	//}
-	//}
-
-	switch eventsAPIEvent.Type {
+	switch typ {
 	case "member_joined_channel":
-		log.Printf("member_joined_channel: %+v", eventsAPIEvent)
+		log.Printf("member_joined_channel: %+v", resp)
 	case "member_left_channel":
-		log.Printf("member_left_channel: %+v", eventsAPIEvent)
+		log.Printf("member_left_channel: %+v", resp)
 	}
 }
-
-//member_joined_channel
-//A user joined a public or private channel
-//channels:read
-
-//member_left_channel
-//A user left a public or private channel
-//channels:read
