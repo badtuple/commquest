@@ -35,29 +35,32 @@ func (s server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func eventHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var resp map[string]interface{}
-	err := json.NewDecoder(r.Body).Decode(&resp)
+	var ev slackEvent
+	err := json.NewDecoder(r.Body).Decode(&ev)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	raw, ok := resp["type"]
-	if !ok {
-		log.Printf("event has no type: %+v", resp)
-		return
-	}
-
-	typ, ok := raw.(string)
-	if !ok {
-		log.Printf("event type is not a string: %+v", resp)
-		return
-	}
-
-	switch typ {
+	switch ev.Event.Type {
 	case "member_joined_channel":
-		log.Printf("member_joined_channel: %+v", resp)
+		log.Printf("member_joined_channel: %+v", ev)
 	case "member_left_channel":
-		log.Printf("member_left_channel: %+v", resp)
+		log.Printf("member_left_channel: %+v", ev)
+	default:
+		log.Printf("unexpected event type: %+v", ev)
 	}
+}
+
+type slackEvent struct {
+	Type    string `json:"type"`
+	EventID string `json:"event_id"`
+
+	Event struct {
+		// "member_joined_channel" or "member_left_channel"
+		Type    string  `json:"type"`
+		EventTS float64 `json:"event_ts"`
+		User    string  `json:"user"`
+		Channel string  `json:"channel"`
+	} `json:"event"`
 }
