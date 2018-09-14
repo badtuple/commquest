@@ -3,6 +3,7 @@ package frontends
 import (
 	"../util"
 	"./api"
+	slack "./slack"
 	"github.com/sirupsen/logrus"
 )
 
@@ -20,6 +21,8 @@ func New(name string) Frontend {
 	switch name {
 	case "api":
 		return Frontend(api.APIFrontend{})
+	case "slack":
+		return Frontend(slack.SlackFrontend{})
 	default:
 		log.Fatalf("unimplemented frontend %s", name)
 	}
