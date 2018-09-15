@@ -19,7 +19,7 @@ func (_ APIFrontend) Name() string {
 	return "api"
 }
 
-func (_ APIFrontend) Serve() error {
+func (_ APIFrontend) Router() *httprouter.Router {
 	router := httprouter.New()
 
 	router.POST("/register", wrap(registerPlayerHandler))
@@ -27,20 +27,11 @@ func (_ APIFrontend) Serve() error {
 
 	// For preflight options calls
 	router.HandleMethodNotAllowed = false
-
-	log.Println("started [api] frontend")
-	return http.ListenAndServe(":8080", server{router})
+	return router
 }
 
-type server struct {
-	r *httprouter.Router
-}
-
-func (s server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, HEAD, OPTIONS, PUT, PATCH, DELETE")
-	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-	s.r.ServeHTTP(w, r)
+func (_ APIFrontend) Port() string {
+	return ":8080"
 }
 
 func wrap(h func(context)) httprouter.Handle {

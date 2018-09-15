@@ -25,9 +25,7 @@ func init() {
 
 func startFrontendAPI() error {
 	log.Println("starting frontend server")
-	fe := frontends.New(config.Get().Frontend)
-
-	err := fe.Serve()
+	err := frontends.Serve(config.Get().Frontend)
 	if err != nil {
 		return err
 	}

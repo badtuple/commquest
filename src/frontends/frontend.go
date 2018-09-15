@@ -1,9 +1,12 @@
 package frontends
 
 import (
+	"net/http"
+
 	"../util"
 	"./api"
 	slack "./slack"
+	"github.com/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
 )
 
@@ -13,19 +16,37 @@ var log *logrus.Entry = util.LoggerFor("frnt")
 type Frontend interface {
 	// Name of the Frontend (api, irc, twitch, etc...)
 	Name() string
-	// Start the server listening for updates from chat client.
-	Serve() error
+
+	// Get router to serve
+	Router() *httprouter.Router
+	// Get Port to serve on
+	Port() string
 }
 
-func New(name string) Frontend {
+func Serve(name string) error {
+	log.Printf("starting [%v] frontend", name)
+
+	var fe Frontend
 	switch name {
 	case "api":
-		return Frontend(api.APIFrontend{})
+		fe = Frontend(api.APIFrontend{})
 	case "slack":
-		return Frontend(slack.SlackFrontend{})
+		fe = Frontend(slack.SlackFrontend{})
 	default:
 		log.Fatalf("unimplemented frontend %s", name)
 	}
 
-	return nil
+	router := fe.Router()
+	return http.ListenAndServe(fe.Port(), server{router})
+}
+
+type server struct {
+	r *httprouter.Router
+}
+
+func (s server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, HEAD, OPTIONS, PUT, PATCH, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+	s.r.ServeHTTP(w, r)
 }
