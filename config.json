@@ -1,4 +1,9 @@
 {
 	"name": "default",
-	"frontend": "slack"
+	"frontend": "slack",
+
+	"slack": {
+		"api_key":"",
+		"channel_id": ""
+	}
 }

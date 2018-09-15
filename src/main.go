@@ -25,7 +25,7 @@ func init() {
 
 func startFrontendAPI() error {
 	log.Println("starting frontend server")
-	err := frontends.Serve(config.Get().Frontend)
+	err := frontend.Serve(config.Get().Frontend)
 	if err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ func main() {
 
 	err := startFrontendAPI()
 	if err != nil {
-		log.Fatal("frontend server couldn't be started: %v", err.Error())
+		log.Fatalf("frontend server couldn't be started: %v", err.Error())
 	}
 
 	log.Println("shutting down")

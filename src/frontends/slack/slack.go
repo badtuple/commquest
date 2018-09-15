@@ -3,6 +3,7 @@ package slack_frontend
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"../../config"
@@ -16,7 +17,7 @@ import (
 
 var log *logrus.Entry = util.LoggerFor("frnt")
 
-var api = slack.New(config.Get().Credentials.SlackAPIKey)
+var api = slack.New(config.Get().Slack.APIKey)
 
 type SlackFrontend struct{}
 
@@ -38,6 +39,21 @@ func (_ SlackFrontend) Port() string {
 	return ":8081"
 }
 
+func (_ SlackFrontend) PushMessage(msg string) error {
+	cid := config.Get().Slack.ChannelID
+	_, _, err := api.PostMessage(cid, msg, slack.PostMessageParameters{})
+	if err != nil {
+		return err
+	}
+
+	log.Printf("message sent to fe: %+v", msg)
+	return nil
+}
+
+func pushMessage(msg string) error {
+	return (SlackFrontend{}).PushMessage(msg)
+}
+
 func eventHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var ev slackEvent
 	err := json.NewDecoder(r.Body).Decode(&ev)
@@ -48,7 +64,7 @@ func eventHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 
 	switch ev.Event.Type {
 	case "member_joined_channel":
-		maybeCreateUser(ev)
+		memberJoinedChannelHandler(ev)
 	case "member_left_channel":
 		// Right now do nothing. When a User being
 		// active is impemented then we'd set them
@@ -58,7 +74,7 @@ func eventHandler(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		log.Printf("unexpected event type: %+v", ev)
 	}
 }
-func maybeCreateUser(ev slackEvent) {
+func memberJoinedChannelHandler(ev slackEvent) {
 	uid := ev.Event.User
 	log.Printf("member_joined_channel: %+v", uid)
 	user, err := api.GetUserInfo(uid)
@@ -85,7 +101,22 @@ func maybeCreateUser(ev slackEvent) {
 		return
 	}
 
+	msg := createdPlayerMessage(p)
+	err = pushMessage(msg)
+	if err != nil {
+		log.Printf("could not send message to channel: %v", err.Error())
+		return
+	}
+
 	log.Printf("created player %+v", p)
+}
+
+func createdPlayerMessage(p models.Player) string {
+	name := p.Handle
+	if len(p.Class) > 0 {
+		name += " the " + p.Class
+	}
+	return fmt.Sprintf(`%v has joined the game!`, name)
 }
 
 type slackEvent struct {

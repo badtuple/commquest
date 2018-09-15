@@ -34,6 +34,14 @@ func (_ APIFrontend) Port() string {
 	return ":8080"
 }
 
+// The API frontend doesn't have the concept of pushing a
+// message.  Evetually we may want to implement a webhook
+// style system where the Config can contain a URL we'll
+// send to.
+func (_ APIFrontend) PushMessage(msg string) error {
+	return nil
+}
+
 func wrap(h func(context)) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		ctx := context{w, r, &p}

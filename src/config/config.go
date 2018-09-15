@@ -19,10 +19,11 @@ type Config struct {
 	// like "slack", "irc", "discord", "twitch", etc.
 	Frontend string `json:"frontend"`
 
-	// Credentials for connecting to frontends
-	Credentials struct {
-		SlackAPIKey string `json:"slack_api_key"`
-	} `json:"credentials"`
+	// Configuration for the Slack frontend
+	Slack struct {
+		APIKey    string `json:"api_key"`
+		ChannelID string `json:"channel_id"`
+	} `json:"slack"`
 }
 
 func Load() error {
