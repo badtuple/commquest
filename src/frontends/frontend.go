@@ -45,6 +45,10 @@ func Serve(name string) error {
 	}
 
 	router := fe.Router()
+	err := PushMessage("The game has resumed!")
+	if err != nil {
+		log.Printf("could not push game resume message to frontend: %v", err.Error())
+	}
 	return http.ListenAndServe(fe.Port(), server{router})
 }
 
