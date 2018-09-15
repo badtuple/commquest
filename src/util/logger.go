@@ -23,7 +23,6 @@ func LoggerFor(component string) *logrus.Entry {
 //	After the double colon is the actual log message.
 func (f *logFormatter) Format(entry *logrus.Entry) ([]byte, error) {
 	ts := entry.Time.Format("2006-01-02 15:04:05.000")
-	//out := fmt.Sprintf("%v %v %v :: %v\n",
 	out := fmt.Sprintf("%v \x1b[%dm%v\x1b[0m %v :: %v\n",
 		ts,
 		entry.Data["color"].(int),

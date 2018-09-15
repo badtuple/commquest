@@ -44,7 +44,7 @@ func incrementXpForIdle() error {
 		return err
 	}
 
-	log.Printf("%v players had xp incremented", affected)
+	log.Printf("xp added for %v players", affected)
 	return nil
 }
 

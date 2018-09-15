@@ -6,30 +6,26 @@ import (
 	"../db"
 )
 
-///////////////////////////
-// The main Player stuct //
-///////////////////////////
-//
-// This handles both User information and Character information.  These may be
-// broken out into different pieces at some point.
-//
+// The Player struct handles both User and Character info.
+// These may be broken into different structs at some point.
 type Player struct {
-	ID     int    `db:"id" json:"id"`
-	Handle string `db:"handle" json:"handle"` // Handle in Frontend
+	ID int `db:"id" json:"id"`
 
-	Name  string `db:"name" json:"name"`   // Name of character
-	Class string `db:"class" json:"class"` // Class of character
-	XP    int    `db:"xp" json:"xp"`       // Experience points
+	// Handle as seen in Frontend
+	Handle string `db:"handle" json:"handle"`
+
+	// Charcter specific information
+	Name  string `db:"name" json:"name"`
+	Class string `db:"class" json:"class"`
+	XP    int    `db:"xp" json:"xp"`
 	Level int    `db:"level" json:"level"`
 
-	///////////
-	// Stats //
-	///////////
+	// Stats
 	//
-	// While these may be used to determine the outcome of fights in the
-	// future, the primary purpose of the stats is to determine character
-	// choices within quests.
-	//
+	// While these may be used to determine the outcome
+	// of fights in the future, the primary purpose of
+	// the stats is to determine character choices
+	// within quests.
 	Strength  int `db:"strength" json:"strength"`
 	Charisma  int `db:"charisma" json:"charisma"`
 	Intellect int `db:"intellect" json:"intellect"`
