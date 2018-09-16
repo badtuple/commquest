@@ -135,5 +135,5 @@ func getHandleFromSlackUser(user *slack.User) string {
 }
 
 func createdPlayerMessage(p models.Player) string {
-	return fmt.Sprintf(`%v has joined the game!`, p.NameAndTitle)
+	return fmt.Sprintf(`%v has joined the game!`, p.NameAndTitle())
 }
