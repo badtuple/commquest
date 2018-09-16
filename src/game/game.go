@@ -1,15 +1,9 @@
 package game
 
 import (
-	"fmt"
-	"math/rand"
-
-	"github.com/jmoiron/sqlx"
 	"github.com/sirupsen/logrus"
 
 	"../db"
-	"../frontends"
-	"../models"
 	"../util"
 )
 
@@ -26,6 +20,11 @@ func PlayTurn() {
 	err = incrementLevels()
 	if err != nil {
 		log.Error("could not increment level. %v", err.Error())
+	}
+
+	err = maybeDropItem()
+	if err != nil {
+		log.Error("could not drop item. %v", err.Error())
 	}
 }
 
@@ -46,53 +45,5 @@ func incrementXpForIdle() error {
 	}
 
 	log.Printf("xp added for %v players", affected)
-	return nil
-}
-
-func incrementLevels() error {
-	ps, err := models.AllPlayers()
-	if err != nil {
-		return err
-	}
-
-	var affected int
-	err = db.Transact(func(tx *sqlx.Tx) error {
-		for _, p := range ps {
-			level := levelFromXp(p.XP)
-			if p.Level >= level {
-				continue
-			}
-
-			// random stat to be incremented
-			stat := models.StatList[rand.Intn(len(models.StatList))]
-
-			query := fmt.Sprintf(`
-				UPDATE players
-				SET level = level + 1, %v = %v + 1, updated_at = NOW()
-				WHERE id = $1`, stat, stat,
-			)
-
-			// Level up
-			p.Level = level
-			_, err = tx.Exec(query, p.ID)
-			if err != nil {
-				return err
-			}
-
-			msg := fmt.Sprintf("%v is now level %v!", p.NameAndTitle(), p.Level)
-			frontend.PushMessage(msg)
-
-			affected++
-		}
-		return nil
-	})
-
-	if err != nil {
-		return err
-	}
-
-	if affected > 0 {
-		log.Printf("%v players leveled up", affected)
-	}
 	return nil
 }

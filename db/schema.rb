@@ -10,10 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_13_055927) do
+ActiveRecord::Schema.define(version: 2018_09_16_034325) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "items", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "article", null: false
+    t.integer "xp_incr", default: 0, null: false
+    t.integer "level_incr", default: 0, null: false
+    t.integer "strength_incr", default: 0, null: false
+    t.integer "charisma_incr", default: 0, null: false
+    t.integer "intellect_incr", default: 0, null: false
+    t.integer "agility_incr", default: 0, null: false
+    t.integer "luck_incr", default: 0, null: false
+  end
 
   create_table "players", force: :cascade do |t|
     t.string "handle", null: false

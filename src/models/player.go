@@ -71,6 +71,23 @@ func (p Player) NameAndTitle() string {
 	return name
 }
 
+func (p *Player) PickUpItem(item Item) error {
+	return db.PSQL().QueryRowx(`
+		UPDATE players
+		SET xp = xp + $2, level = level + $3,
+			strength = strength + $4, charisma = charisma + $5,
+			intellect = intellect + $6, agility = agility + $7,
+			luck = luck + $8
+		WHERE id = $1
+		RETURNING 
+			xp, level, strength, charisma, intellect, agility, luck
+		`, p.ID, item.XPIncr, item.LevelIncr,
+		item.StrengthIncr, item.CharismaIncr,
+		item.IntellectIncr, item.AgilityIncr,
+		item.LuckIncr,
+	).StructScan(&p)
+}
+
 func CreatePlayer(handle, name, class string) (Player, error) {
 	var p Player
 	err := db.PSQL().QueryRowx(`
