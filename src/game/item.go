@@ -53,25 +53,25 @@ func droppedItemMessage(p models.Player, item models.Item) string {
 	}
 
 	var incrs []string
-	if item.LevelIncr > 0 {
+	if item.LevelIncr != 0 {
 		incrs = append(incrs, fmt.Sprintf("%v levels", item.LevelIncr))
 	}
-	if item.XPIncr > 0 {
+	if item.XPIncr != 0 {
 		incrs = append(incrs, fmt.Sprintf("%v xp", item.XPIncr))
 	}
-	if item.StrengthIncr > 0 {
+	if item.StrengthIncr != 0 {
 		incrs = append(incrs, fmt.Sprintf("%v strength", item.StrengthIncr))
 	}
-	if item.CharismaIncr > 0 {
+	if item.CharismaIncr != 0 {
 		incrs = append(incrs, fmt.Sprintf("%v charisma", item.CharismaIncr))
 	}
-	if item.IntellectIncr > 0 {
+	if item.IntellectIncr != 0 {
 		incrs = append(incrs, fmt.Sprintf("%v intellect", item.IntellectIncr))
 	}
-	if item.AgilityIncr > 0 {
+	if item.AgilityIncr != 0 {
 		incrs = append(incrs, fmt.Sprintf("%v agility", item.AgilityIncr))
 	}
-	if item.LuckIncr > 0 {
+	if item.LuckIncr != 0 {
 		incrs = append(incrs, fmt.Sprintf("%v luck", item.LuckIncr))
 	}
 
@@ -84,20 +84,6 @@ func droppedItemMessage(p models.Player, item models.Item) string {
 		"%v found %v! They gain %v ",
 		p.NameAndTitle(), itemAndArticle,
 		strings.Join(incrs, ", "),
-	)
-
-	msg += fmt.Sprintf(
-		"\n%v's new stats: "+
-			"*Level*: %v *XP*: %v *Strength*: %v *Charisma*: %v "+
-			"*Intellect*: %v *Agility*: %v *Luck*: %v",
-		k.NameAndTitle(),
-		p.Level,
-		p.XP,
-		p.Strength,
-		p.Charisma,
-		p.Intellect,
-		p.Agility,
-		p.Luck,
 	)
 
 	return msg

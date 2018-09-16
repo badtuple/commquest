@@ -12,7 +12,7 @@ import (
 )
 
 func levelFromXp(xp int) int {
-	const base float64 = 0.9
+	const base float64 = 0.68
 	level := base * math.Cbrt(float64(xp))
 	return int(level)
 }
@@ -47,7 +47,12 @@ func incrementLevels() error {
 				return err
 			}
 
-			msg := fmt.Sprintf("%v is now level %v!", p.NameAndTitle(), p.Level)
+			msg := fmt.Sprintf("%v is now level %v!\n%v",
+				p.NameAndTitle(),
+				p.Level,
+				statsMsg(p),
+			)
+
 			frontend.PushMessage(msg)
 
 			affected++
@@ -63,4 +68,20 @@ func incrementLevels() error {
 		log.Printf("%v players leveled up", affected)
 	}
 	return nil
+}
+
+func statsMsg(p models.Player) string {
+	return fmt.Sprintf(
+		"%v's new stats: "+
+			"*Level*: %v *XP*: %v *Strength*: %v *Charisma*: %v "+
+			"*Intellect*: %v *Agility*: %v *Luck*: %v",
+		p.NameAndTitle(),
+		p.Level,
+		p.XP,
+		p.Strength,
+		p.Charisma,
+		p.Intellect,
+		p.Agility,
+		p.Luck,
+	)
 }
