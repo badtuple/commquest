@@ -2,19 +2,17 @@ package frontend
 
 import (
 	"errors"
-	"net/http"
 
 	"../util"
-	"./api"
+	//"./api"
 	slack "./slack"
-	"github.com/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
 )
 
 var log *logrus.Entry = util.LoggerFor("frnt")
 
-// Global state is bad.  But I'm basically treating this
-// package as more of a module.  Eventually this wil likely
+// Global state is bad, but I'm basically treating this
+// package as more of a module. Eventually this will likely
 // need to be a slice of frontends if we are going to
 // support running the same game on multiple at once
 var fe Frontend
@@ -24,43 +22,28 @@ type Frontend interface {
 	// Name of the Frontend (api, irc, twitch, etc...)
 	Name() string
 
-	// Get router to serve
-	Router() *httprouter.Router
-	// Get Port to serve on
-	Port() string
+	Serve() error
 
 	PushMessage(string) error
 }
 
+// expected to block
 func Serve(name string) error {
 	log.Printf("starting [%v] frontend", name)
 
 	switch name {
 	case "api":
-		fe = Frontend(api.APIFrontend{})
+	// TODO: We broke the API fe while moving the slack
+	// api to RTM.  Will need to hook it back up
+
+	//fe = Frontend(api.APIFrontend{})
 	case "slack":
 		fe = Frontend(slack.SlackFrontend{})
+		fe.Serve()
 	default:
 		log.Fatalf("unimplemented frontend %s", name)
 	}
-
-	router := fe.Router()
-	err := PushMessage("The game has resumed!")
-	if err != nil {
-		log.Printf("could not push game resume message to frontend: %v", err.Error())
-	}
-	return http.ListenAndServe(fe.Port(), server{router})
-}
-
-type server struct {
-	r *httprouter.Router
-}
-
-func (s server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, HEAD, OPTIONS, PUT, PATCH, DELETE")
-	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
-	s.r.ServeHTTP(w, r)
+	return nil
 }
 
 // Push a message to the running frontend

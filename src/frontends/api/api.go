@@ -101,3 +101,14 @@ func getPlayerHandler(ctx context) {
 
 	ctx.Ok(p)
 }
+
+type server struct {
+	r *httprouter.Router
+}
+
+func (s server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, HEAD, OPTIONS, PUT, PATCH, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization")
+	s.r.ServeHTTP(w, r)
+}
