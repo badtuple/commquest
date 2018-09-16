@@ -19,17 +19,17 @@ type SlackFrontend struct {
 	RTM    *slack.RTM
 }
 
-func (_ SlackFrontend) Name() string {
+func (fe *SlackFrontend) Name() string {
 	return "slack"
 }
 
-func (fe SlackFrontend) PushMessage(msg string) error {
+func (fe *SlackFrontend) PushMessage(msg string) error {
 	cid := config.Get().Slack.ChannelID
 	_, _, err := fe.RTM.PostMessage(cid, msg, slack.NewPostMessageParameters())
 	return err
 }
 
-func (fe SlackFrontend) Serve() error {
+func (fe *SlackFrontend) Serve() error {
 	key := config.Get().Slack.APIKey
 	fe.Client = slack.New(key)
 	fe.RTM = fe.Client.NewRTM()
@@ -77,7 +77,7 @@ Loop:
 	return nil
 }
 
-func (fe SlackFrontend) memberJoinedChannelHandler(ev *slack.MemberJoinedChannelEvent) {
+func (fe *SlackFrontend) memberJoinedChannelHandler(ev *slack.MemberJoinedChannelEvent) {
 	uid := ev.User
 	log.Printf("member_joined_channel: %+v", uid)
 
@@ -135,9 +135,5 @@ func getHandleFromSlackUser(user *slack.User) string {
 }
 
 func createdPlayerMessage(p models.Player) string {
-	name := p.Handle
-	if len(p.Class) > 0 {
-		name += " the " + p.Class
-	}
-	return fmt.Sprintf(`%v has joined the game!`, name)
+	return fmt.Sprintf(`%v has joined the game!`, p.NameAndTitle)
 }

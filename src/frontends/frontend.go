@@ -38,7 +38,7 @@ func Serve(name string) error {
 
 	//fe = Frontend(api.APIFrontend{})
 	case "slack":
-		fe = Frontend(slack.SlackFrontend{})
+		fe = Frontend(&slack.SlackFrontend{})
 		fe.Serve()
 	default:
 		log.Fatalf("unimplemented frontend %s", name)
@@ -53,5 +53,4 @@ func PushMessage(msg string) error {
 	}
 
 	return fe.PushMessage(msg)
-
 }

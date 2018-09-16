@@ -63,6 +63,14 @@ func (p Player) PrimaryStat() (string, int) {
 	return stat, val
 }
 
+func (p Player) NameAndTitle() string {
+	name := p.Handle
+	if len(p.Class) > 0 {
+		name += " the " + p.Class
+	}
+	return name
+}
+
 func CreatePlayer(handle, name, class string) (Player, error) {
 	var p Player
 	err := db.PSQL().QueryRowx(`

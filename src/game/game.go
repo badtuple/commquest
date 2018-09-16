@@ -8,6 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"../db"
+	"../frontends"
 	"../models"
 	"../util"
 )
@@ -77,6 +78,9 @@ func incrementLevels() error {
 			if err != nil {
 				return err
 			}
+
+			msg := fmt.Sprintf("%v is now level %v!", p.NameAndTitle(), p.Level)
+			frontend.PushMessage(msg)
 
 			affected++
 		}
