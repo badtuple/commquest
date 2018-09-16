@@ -10,8 +10,8 @@ import (
 )
 
 func maybeDropItem() error {
-	// Drop item 1/20th of the time
-	x := rand.Intn(20)
+	// Drop item 1/60th of the time
+	x := rand.Intn(60)
 	if x != 0 {
 		log.Println("no item drop this turn")
 		return nil
@@ -81,15 +81,16 @@ func droppedItemMessage(p models.Player, item models.Item) string {
 	}
 
 	msg := fmt.Sprintf(
-		"%v found %v!\nThey gain %v\n",
+		"%v found %v! They gain %v ",
 		p.NameAndTitle(), itemAndArticle,
 		strings.Join(incrs, ", "),
 	)
 
 	msg += fmt.Sprintf(
-		"Their stats are now:\n"+
+		"\n%v's new stats: "+
 			"*Level*: %v *XP*: %v *Strength*: %v *Charisma*: %v "+
 			"*Intellect*: %v *Agility*: %v *Luck*: %v",
+		p.NameAndTitle(),
 		p.Level,
 		p.XP,
 		p.Strength,
