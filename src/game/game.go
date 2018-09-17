@@ -12,19 +12,24 @@ var log *logrus.Entry = util.LoggerFor("game")
 func PlayTurn() {
 	log.Println("playing turn")
 
-	err := incrementXpForIdle()
+	err := maybeStartOrProgressQuest()
 	if err != nil {
-		log.Error("could not incr xp for idle. %v", err.Error())
+		log.Error("could not progress quest. %v", err.Error())
 	}
 
-	err = incrementLevels()
+	err = incrementXpForIdle()
 	if err != nil {
-		log.Error("could not increment level. %v", err.Error())
+		log.Error("could not incr xp for idle. %v", err.Error())
 	}
 
 	err = maybeDropItem()
 	if err != nil {
 		log.Error("could not drop item. %v", err.Error())
+	}
+
+	err = incrementLevels()
+	if err != nil {
+		log.Error("could not increment level. %v", err.Error())
 	}
 }
 
