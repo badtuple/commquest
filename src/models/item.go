@@ -51,3 +51,14 @@ func AllItems() ([]Item, error) {
 	`)
 	return is, err
 }
+
+func GetRandomItem() (*Item, error) {
+	var item Item
+	err := db.PSQL().QueryRowx(`
+		SELECT id, name, article
+		FROM items
+		ORDER BY RANDOM()
+		LIMIT 1
+	`).StructScan(&item)
+	return &item, err
+}

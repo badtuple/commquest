@@ -1,4 +1,11 @@
-package models
+package quest
+
+import (
+	"bytes"
+	"html/template"
+
+	"../models"
+)
 
 // A Quest's narrative consists of 4 sections:
 //	Intro -- a Call to action for the group.
@@ -45,10 +52,10 @@ type intro struct {
 	Tmpl string // Intro text template
 
 	// Item to be obtained, destroyed, or transported
-	Item *string
+	Item *models.Item
 
 	// Person to be rescued or escorted
-	Person *string
+	Person *models.Person
 
 	// Town to be saved. Alternatively the town where
 	// the quest originated.
@@ -56,6 +63,21 @@ type intro struct {
 
 	// Certain intro types require a specific ending
 	EndType []string
+}
+
+func (in intro) RenderMsg() string {
+	buf := new(bytes.Buffer)
+	tmpl, err := template.New("").Parse(in.Tmpl)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	err = tmpl.Execute(buf, in)
+	if err != nil {
+		panic(err)
+	}
+
+	return buf.String()
 }
 
 type obstacle struct{}
@@ -69,6 +91,21 @@ type end struct {
 	Tmpl string // Ending text template
 }
 
+func (e end) RenderMsg() string {
+	buf := new(bytes.Buffer)
+	tmpl, err := template.New("").Parse(e.Tmpl)
+	if err != nil {
+		panic(err)
+	}
+
+	err = tmpl.Execute(buf, e)
+	if err != nil {
+		panic(err)
+	}
+
+	return buf.String()
+}
+
 // TODOs:
 //	[ ] obtain -- Obtain a particular item or animal
 //	[ ] destroy -- Destroy a particular item
@@ -76,3 +113,7 @@ type end struct {
 //	[ ] save_town -- Save a town that's being terroized
 //	[ ] rescue -- Rescue a particular person or animal
 //	[ ] escort -- Transport a person or animal between towns
+
+func Gen() Quest {
+	return genObtainQuest()
+}
