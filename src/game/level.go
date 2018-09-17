@@ -37,12 +37,12 @@ func incrementLevels() error {
 			query := fmt.Sprintf(`
 				UPDATE players
 				SET level = level + 1, %v = %v + 1, updated_at = NOW()
-				WHERE id = $1`, stat, stat,
+				WHERE id = $1
+				RETURNING xp, level, strength, charisma, intellect, agility, luck
+				`, stat, stat,
 			)
 
-			// Level up
-			p.Level = level
-			_, err = tx.Exec(query, p.ID)
+			err = tx.QueryRowx(query, p.ID).StructScan(&p)
 			if err != nil {
 				return err
 			}
@@ -50,7 +50,7 @@ func incrementLevels() error {
 			msg := fmt.Sprintf("%v is now level %v!\n%v",
 				p.NameAndTitle(),
 				p.Level,
-				statsMsg(p),
+				leveledUpMsg(p),
 			)
 
 			frontend.PushMessage(msg)
@@ -70,11 +70,11 @@ func incrementLevels() error {
 	return nil
 }
 
-func statsMsg(p models.Player) string {
+func leveledUpMsg(p models.Player) string {
 	return fmt.Sprintf(
-		"%v's new stats: "+
-			"*Level*: %v *XP*: %v *Strength*: %v *Charisma*: %v "+
-			"*Intellect*: %v *Agility*: %v *Luck*: %v",
+		"%v has leveled up! *Level*: %v, *XP*: %v, *Strength*: %v, "+
+			"*Charisma*: %v, *Intellect*: %v, *Agility*: %v ,*Luck*: %v",
+
 		p.NameAndTitle(),
 		p.Level,
 		p.XP,
