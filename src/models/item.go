@@ -5,8 +5,8 @@ import "../db"
 type Item struct {
 	ID int `db:"id"`
 
-	Name    string `db:"name"`
-	Article string `db:"article"`
+	Name    string `db:"name" json:"name"`
+	Article string `db:"article" json:"article"`
 
 	XPIncr        int `db:"xp_incr"`
 	LevelIncr     int `db:"level_incr"`
