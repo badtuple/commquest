@@ -47,7 +47,7 @@ func incrementLevels() error {
 				return err
 			}
 
-			msg := fmt.Sprintf("%v is now level %v!\n%v",
+			msg := fmt.Sprintf("%v is now level %v! %v",
 				p.NameAndTitle(),
 				p.Level,
 				leveledUpMsg(p),
@@ -72,11 +72,7 @@ func incrementLevels() error {
 
 func leveledUpMsg(p models.Player) string {
 	return fmt.Sprintf(
-		"%v has leveled up! *Level*: %v, *XP*: %v, *Strength*: %v, "+
-			"*Charisma*: %v, *Intellect*: %v, *Agility*: %v ,*Luck*: %v",
-
-		p.NameAndTitle(),
-		p.Level,
+		"*XP*: %v, *Strength*: %v, *Charisma*: %v, *Intellect*: %v, *Agility*: %v, *Luck*: %v",
 		p.XP,
 		p.Strength,
 		p.Charisma,
